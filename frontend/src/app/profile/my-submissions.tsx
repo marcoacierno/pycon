@@ -45,7 +45,7 @@ export const MySubmissions: React.SFC<Props> = ({ className }) => {
           mt: 4,
         }}
       >
-        <Heading mb={3} as="h2">
+        <Heading mb={3} as="h1">
           <FormattedMessage id="profile.mySubmissionsHeader" />
         </Heading>
 
