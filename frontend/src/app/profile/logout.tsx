@@ -44,7 +44,7 @@ export const Logout: React.SFC<{ lang: string }> = ({ lang }) => {
           px: 3,
         }}
       >
-        <Heading mb={2} as="h1">
+        <Heading mb={2} as="h2" sx={{ fontSize: 5 }}>
           <FormattedMessage id="profile.logout" />
         </Heading>
 
