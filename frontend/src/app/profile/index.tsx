@@ -18,6 +18,7 @@ import { Logout } from "./logout";
 import { MyOrders } from "./my-orders";
 import { MyProfile } from "./my-profile";
 import { MySubmissions } from "./my-submissions";
+import { MyTickets } from "./my-tickets";
 import MY_PROFILE_QUERY from "./profile.graphql";
 
 export const ProfileApp: React.SFC<RouteComponentProps> = () => {
@@ -31,6 +32,7 @@ export const ProfileApp: React.SFC<RouteComponentProps> = () => {
   >(MY_PROFILE_QUERY, {
     variables: {
       conference: code,
+      language: lang,
     },
   });
 
@@ -69,6 +71,20 @@ export const ProfileApp: React.SFC<RouteComponentProps> = () => {
   return (
     <Fragment>
       <MyProfile profile={profileData} />
+
+      {profileData.me.tickets.length > 0 && (
+        <MyTickets
+          tickets={profileData.me.tickets}
+          sx={{
+            borderTop: "primary",
+            py: 4,
+
+            "> div": {
+              px: 3,
+            },
+          }}
+        />
+      )}
 
       {profileData.me.orders.length > 0 && (
         <MyOrders orders={profileData.me.orders} />
