@@ -8,11 +8,8 @@ import { EditProfileApp } from "../app/profile-edit";
 import { CFPPage } from "../components/cpf-page";
 import { EditSubmission } from "../components/edit-submission";
 import { LoginForm } from "../components/login-form";
-<<<<<<< HEAD
-import { RankingPage } from "../components/ranking-page";
-=======
 import { ManageTicket } from "../components/manage-ticket";
->>>>>>> Implement manage ticket screen amd my tickets list
+import { RankingPage } from "../components/ranking-page";
 import { RequestPasswordReset } from "../components/request-reset-password";
 import { ResetPassword } from "../components/reset-password";
 import { SignupForm } from "../components/signup-form";

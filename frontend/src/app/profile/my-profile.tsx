@@ -75,7 +75,7 @@ export const MyProfile: React.SFC<{ profile: MyProfileQuery }> = ({
             <FormattedMessage id="profile.profileHeader" />
           </Heading>
 
-          <Link href={`/:language/profile/edit/`} variant="button">
+          <Link href={`/:language/profile/edit/`} variant="arrow-button">
             <FormattedMessage id="profile.editProfile" />
           </Link>
 
