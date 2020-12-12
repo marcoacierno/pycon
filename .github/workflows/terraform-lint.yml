@@ -1,64 +1,75 @@
 on:
   pull_request:
     paths:
-    - 'infrastructure/**/*'
-    - 'infrastructure/*'
+      - "infrastructure/**/*"
+      - "infrastructure/*"
 
 name: Terraform Lint
+
+env:
+  TFMASK_VALUES_REGEX: "(?i)^.*(akia|aroa|asia|access|webhook|aws|setting|profile|database|host|username|address|dsn|oauth|oauth2|application|secret|token|password|key|result|id).*$"
+  TFMASK_RESOURCES_REGEX: "(?i)^(random_id|random_string).*$"
 
 jobs:
   lint:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master
+      - uses: actions/checkout@master
 
-    - name: terraform-fmt
-      uses: hashicorp/terraform-github-actions/fmt@v0.3.5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TF_ACTION_WORKING_DIR: ./infrastructure
+      - name: terraform-fmt
+        uses: hashicorp/terraform-github-actions/fmt@v0.3.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_ACTION_WORKING_DIR: ./infrastructure
 
   plan:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infrastructure
 
     steps:
-    - uses: actions/checkout@master
+      - uses: actions/checkout@master
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.13.3
+      - name: Terraform init
+        run: terraform init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: terraform-init
-      uses: hashicorp/terraform-github-actions/init@v0.3.5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_ACTION_WORKING_DIR: ./infrastructure
+      - name: Terraform validate
+        run: terraform validate -no-color >/dev/null 2>&1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: terraform-validate
-      uses: hashicorp/terraform-github-actions/validate@v0.3.5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_ACTION_WORKING_DIR: ./infrastructure
-
-    - name: terraform-plan
-      uses: ./.github/terraform-plan-action
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_VAR_database_password: ${{ secrets.TF_VAR_database_password }}
-        TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
-        TF_VAR_mapbox_public_api_key: ${{ secrets.TF_VAR_mapbox_public_api_key }}
-        TF_VAR_sentry_dsn: ${{ secrets.TF_VAR_sentry_dsn }}
-        TF_VAR_ssl_certificate: ${{ secrets.TF_VAR_ssl_certificate }}
-        TF_VAR_slack_incoming_webhook_url: ${{ secrets.TF_VAR_slack_incoming_webhook_url }}
-        TF_VAR_social_auth_google_oauth2_key: ${{ secrets.TF_VAR_social_auth_google_oauth2_key }}
-        TF_VAR_social_auth_google_oauth2_secret: ${{ secrets.TF_VAR_social_auth_google_oauth2_secret }}
-        TF_VAR_mail_user: ${{ secrets.TF_VAR_mail_user }}
-        TF_VAR_mail_password: ${{ secrets.TF_VAR_mail_password }}
-        TF_VAR_pretix_secret_key: ${{ secrets.TF_VAR_pretix_secret_key }}
-        TF_VAR_pretix_api_token:  ${{ secrets.TF_VAR_pretix_api_token }}
-        TF_VAR_pinpoint_application_id: ${{ secrets.TF_VAR_pinpoint_application_id }}
-        TF_ACTION_WORKING_DIR: ./infrastructure
-        TF_ACTION_WORKSPACE: production
+      - name: Terraform plan
+        id: plan
+        run: terraform plan -no-color >/dev/null 2>&1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_database_password: ${{ secrets.TF_VAR_database_password }}
+          TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
+          TF_VAR_mapbox_public_api_key: ${{ secrets.TF_VAR_mapbox_public_api_key }}
+          TF_VAR_sentry_dsn: ${{ secrets.TF_VAR_sentry_dsn }}
+          TF_VAR_ssl_certificate: ${{ secrets.TF_VAR_ssl_certificate }}
+          TF_VAR_slack_incoming_webhook_url: ${{ secrets.TF_VAR_slack_incoming_webhook_url }}
+          TF_VAR_social_auth_google_oauth2_key: ${{ secrets.TF_VAR_social_auth_google_oauth2_key }}
+          TF_VAR_social_auth_google_oauth2_secret: ${{ secrets.TF_VAR_social_auth_google_oauth2_secret }}
+          TF_VAR_mail_user: ${{ secrets.TF_VAR_mail_user }}
+          TF_VAR_mail_password: ${{ secrets.TF_VAR_mail_password }}
+          TF_VAR_pretix_secret_key: ${{ secrets.TF_VAR_pretix_secret_key }}
+          TF_VAR_pretix_api_token: ${{ secrets.TF_VAR_pretix_api_token }}
+          TF_VAR_pinpoint_application_id: ${{ secrets.TF_VAR_pinpoint_application_id }}
+          TF_WORKSPACE: production
+      - name: test
+        run: |
+          echo "hello"
+          echo ${{ steps.plan.outcome }}
