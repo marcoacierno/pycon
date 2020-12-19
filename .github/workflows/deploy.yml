@@ -30,10 +30,9 @@ jobs:
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
-        working-directory: backend
         with:
-          context: ./
-          file: ./Dockerfile.lambda
+          context: ./backend
+          file: ./backend/Dockerfile.lambda
           builder: ${{ steps.buildx.outputs.name }}
           push: false
           tags: production-pycon-backend:latest
