@@ -60,3 +60,5 @@ class DayAdmin(admin.ModelAdmin):
     list_display = ("day", "conference")
     list_filter = ("conference",)
     inlines = (SlotInline,)
+
+# test changing BE code
